@@ -1,6 +1,6 @@
 // Hooks de React
 import {useEffect, useReducer, useMemo} from 'react';
-
+import { Image } from "react-native";
 // Utilidades de React Navigation
 //@react-navigation/native - Librería incluida cuando se crea el proyecto
 import { NavigationContainer } from '@react-navigation/native';
@@ -26,9 +26,10 @@ import LoginScreen from './screen/access/LoginScreen';
 
 // Pantallas para la navegación principal
 import HomeScreen from './screen/main/HomeScreen';
+import ModalCamera from './components/ModalCamera';
 
 
-
+const usuario = ""
 // Navegador Stack - Main
 const StackMain = createStackNavigator();
 function NavStack (){
@@ -45,6 +46,38 @@ function NavStack (){
   );
 }
 
+// Navegador Stack - Home
+const HomeAccess = createStackNavigator();
+function HomeNav (){
+  return(
+    <HomeAccess.Navigator>
+      <HomeAccess.Screen
+        name='Inicio'
+        component={HomeScreen}
+        options={{
+          headerShown: false,
+        }}
+      />  
+      <HomeAccess.Screen
+      name='Foto'
+      component={ModalCamera}
+      options={{
+        headerShown: false,
+      }}
+      />
+    </HomeAccess.Navigator>
+  );
+}
+
+function renderLogo() {
+  return (
+    <Image
+      source={require("./assets/logo.png")}
+      style={{ width: 100, height: 100, top: -15 }}
+    />
+  );
+}
+
 
 // Navegador Stack - Access
 const StackAccess = createStackNavigator();
@@ -55,12 +88,9 @@ function AccessNav (){
         name='Login'
         component={LoginScreen}
         options={{
-          headerStyle: { 
-            backgroundColor: '#FFC300',
-          },
-          headerTintColor: '#fff',
+          headerShown: false,
         }}
-      />
+      />  
     </StackAccess.Navigator>
   );
 }
@@ -74,20 +104,15 @@ function BottomTab() {
     <Tab.Navigator>
       <Tab.Screen
         name="Home" 
-        component={HomeScreen}
+        component={HomeNav}
         options={{ 
-          title: 'Inicio', 
-          tabBarActiveTintColor: '#FFC300',
-          headerStyle: { 
-            backgroundColor: '#FFC300',
-          },
+          headerShown: false,
           headerTintColor: '#fff',
-          tabBarIcon: ({color}) => (
-            <Ionicons name="home" color={color} size={24} />
-          )
+          tabBarLabel: "",
+            tabBarIcon: () => renderLogo(),
+            headerTitleAlign: "center",
         }}
       />
-      
     </Tab.Navigator>
   );
 }
@@ -149,7 +174,6 @@ export default function App() {
 
 
 
-
   //useEffect: Hoook que de forma predeterminada, se ejecuta después del primer renderizado 
   //y después de cada actualización
   useEffect(() => {
@@ -164,8 +188,8 @@ export default function App() {
 
         //Proceso para obtención de Información del usuario u
         //obtención de parámetros para iniciar la App
-        userToken = 'dummy-auth-token';
-        //userToken = null;
+        
+        userToken = null;
 
       } catch (e) {
         //Mostrar Error en caso de existir
@@ -198,30 +222,20 @@ export default function App() {
     () => ({
 
       //signIn: async (data) => {
-      signIn: () => {
+      signIn: (userData) => {
         // In a production app, we need to send some data (usually username, password) to server and get a token
         // We will also need to handle errors if sign in failed
         // After getting token, we need to persist the token using `SecureStore` or any other encrypted storage
         // In the example, we'll use a dummy token
-
+      
         // Solo se pasan parámetros del argumento "action"
-        dispatch({ type: 'SIGN_IN', userToken: 'dummy-auth-token' });
+        dispatch({ type: 'SIGN_IN', userToken: userData._id });
       },
       signOut: () => {
 
         // Solo se pasan parámetros del argumento "action"
         dispatch({ type: 'SIGN_OUT' })
 
-      },
-      //signUp: async (data) => {
-      signUp: () => {
-        // In a production app, we need to send user data to server and get a token
-        // We will also need to handle errors if sign up failed
-        // After getting token, we need to persist the token using `SecureStore` or any other encrypted storage
-        // In the example, we'll use a dummy token
-
-        // Solo se pasan parámetros del argumento "action"
-        dispatch({ type: 'SIGN_IN', userToken: 'dummy-auth-token' });
       },
       
     }),

@@ -19,12 +19,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptative-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.alvarezsebas92.appsupervisores"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "60c172c0-6383-4ddf-b17e-e1bdbbf47b22"
+      }
     }
   }
 }
