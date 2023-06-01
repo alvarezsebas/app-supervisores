@@ -20,6 +20,9 @@ import { SignatureView } from "react-native-signature-capture-view";
 import { postDatos } from "../../api/revista";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import * as Location from 'expo-location';
+
+
 
 const data = [];
 const datos = async () => {
@@ -37,11 +40,16 @@ const datos = async () => {
 export default function HomeScreen(props) {
   const { authe, state } = useContext(AuthContext);
   const navigation = useNavigation();
-  const [selectedLanguage, setSelectedLanguage] = useState();
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   const [text, setText] = useState("");
   const [textSuper, setTextSuper] = useState("");
+
+  const [location, setLocation] = useState(null);
+  const [longitud, setLongitud] = useState(null);
+  const [latitud, setLatitud] = useState(null);
+
+  const [errorMsg, setErrorMsg] = useState(null);
   const renderLabel = () => {
     if (value || isFocus) {
       return (
@@ -56,23 +64,47 @@ export default function HomeScreen(props) {
   const foto = () => {
     navigation.navigate("Foto");
   };
-  useEffect(() => {
+  useEffect(async () => {
+   const ubicacion = async() => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLongitud(location.coords.longitude);
+      setLatitud(location.coords.latitude);
+      setLocation(location.coords);
+    }
+    ubicacion();
     datos();
   }, []);
+
+  let loct = 'Waiting..';
+  if (errorMsg) {
+    loct = errorMsg;
+  } else if (location) {
+    loct = JSON.stringify(location);
+  }
 
   const formik = useFormik({
     initialValues: initialValues(),
     validationSchema: Yup.object(validationSchema()),
     validateOnChange: false,
     onSubmit: async (formValues, {resetForm}) => {
+  
+      let foto = "data:image/png;base64,"+this.foto
       let datas = {
         firmaCliente: text,
         firmaSuper: textSuper,
-        foto: this.foto,
+        foto: foto,
         nombreEmpleado: formValues.nombreEmpleado,
         usuario: this.usuario,
         comentario: formValues.comentario,
-        abonado: value
+        abonado: value,
+        latitud: latitud,
+        longitud: longitud
       };
       try {
         const response = await postDatos(datas);
@@ -87,6 +119,7 @@ export default function HomeScreen(props) {
       setValue("")
       signatureRef.current.clearSignature();
       signatureRefSuper.current.clearSignature();
+      setLocation("");
     }, 1000);
         } else {
         }
@@ -97,7 +130,8 @@ export default function HomeScreen(props) {
   const signatureRef = useRef(null);
   const signatureRefSuper = useRef(null);
   return (
-    <View style={styles.container}>
+    <ScrollView>
+       <View style={styles.container}>
       {renderLabel()}
       <Dropdown
         style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
@@ -204,6 +238,8 @@ export default function HomeScreen(props) {
       <Text>{"\n"}</Text>
       <Button onPress={formik.handleSubmit} title="Guardar reporte" />
     </View>
+    </ScrollView>
+   
   );
 }
 

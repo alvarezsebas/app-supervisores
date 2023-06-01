@@ -73,7 +73,7 @@ function renderLogo() {
   return (
     <Image
       source={require("./assets/logo.png")}
-      style={{ width: 100, height: 100, top: -15 }}
+      style={{ width: 70, height: 70, top: -15 }}
     />
   );
 }
@@ -184,7 +184,7 @@ export default function App() {
       
       try {
         // Retrazar el lanzamiento de aplicación por 5 segundos
-        await new Promise((resolve) => setTimeout(resolve, 5000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         //Proceso para obtención de Información del usuario u
         //obtención de parámetros para iniciar la App
